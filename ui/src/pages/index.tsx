@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { GetStaticProps } from 'next';
 import Head from 'next/head';
 import styles from './index.module.scss';
@@ -93,6 +93,26 @@ export default function Home({
     window.scrollTo({ top: 0 });
     setShowMobileCategories(true);
   };
+
+  useEffect(() => {
+    const warmUpApi = async () => {
+      try {
+        await fetch('https://registry.pgtrunk.io/extensions/all', { 
+          method: 'HEAD',
+          cache: 'no-cache'
+        });
+      } catch (error) {
+        console.debug('API warmup failed:', error);
+      }
+    };
+    
+    warmUpApi();
+    
+    const interval = setInterval(warmUpApi, 4 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div>
       <Head>

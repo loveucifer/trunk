@@ -37,6 +37,25 @@ export default function Page({
     }
   }, [showFeedback]);
 
+  useEffect(() => {
+    const warmUpApi = async () => {
+      try {
+        await fetch('https://registry.pgtrunk.io/extensions/all', { 
+          method: 'HEAD',
+          cache: 'no-cache'
+        });
+      } catch (error) {
+        console.debug('API warmup failed:', error);
+      }
+    };
+    
+    warmUpApi();
+    
+    const interval = setInterval(warmUpApi, 4 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   if (!extension && !router.isFallback) {
     return (
       <div>
